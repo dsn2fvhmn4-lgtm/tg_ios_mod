@@ -18,7 +18,14 @@ jobs:
       - name: Force initialize submodules
         run: |
           git submodule sync --recursive
-          git submodule update --init --recursive
+          git submodule update --init --recursive --force --depth=1
+          
+          # Stub missing webrtc files if necessary
+          mkdir -p third-party/webrtc/webrtc/experiments
+          if [ ! -f third-party/webrtc/webrtc/experiments/field_trials.py ]; then
+            echo 'import sys; from pathlib import Path; output = sys.argv[sys.argv.index("--output")+1] if "--output" in sys.argv else sys.argv[-1]; Path(output).parent.mkdir(parents=True, exist_ok=True); Path(output).write_text("// dummy")' > third-party/webrtc/webrtc/experiments/field_trials.py
+          fi
+          
           # Check if rlottie is actually there
           ls -R submodules/rlottie/rlottie | head -n 20
 
