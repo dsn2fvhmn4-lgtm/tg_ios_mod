@@ -6,8 +6,14 @@ build --apple_crosstool_top=@local_config_apple_cc//:toolchain
 build --crosstool_top=@local_config_apple_cc//:toolchain
 build --host_crosstool_top=@local_config_apple_cc//:toolchain
 
-build --per_file_copt=".*\.m$","@-fno-objc-msgsend-selector-stubs"
-build --per_file_copt=".*\.mm$","@-fno-objc-msgsend-selector-stubs"
+build --per_file_copt=".*\.m$","@-fno-objc-msgsend-selector-stubs","-Wno-error=deprecated-declarations","-Wno-deprecated-declarations"
+build --per_file_copt=".*\.mm$","@-fno-objc-msgsend-selector-stubs","-Wno-error=deprecated-declarations","-Wno-deprecated-declarations"
+build --copt="-Wno-error=deprecated-declarations"
+build --copt="-Wno-deprecated-declarations"
+build --objccopt="-Wno-error=deprecated-declarations"
+build --objccopt="-Wno-deprecated-declarations"
+build --swiftcopt="-Xfrontend"
+build --swiftcopt="-suppress-warnings"
 
 build --features=debug_prefix_map_pwd_is_dot
 build --features=swift.cacheable_swiftmodules
