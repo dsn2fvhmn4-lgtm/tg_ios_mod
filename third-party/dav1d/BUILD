@@ -29,7 +29,7 @@ filegroup(
     name = "dav1d_sources",
     srcs = glob([
         "dav1d/**/*"
-    ]),
+    ], allow_empty = True),
 )
 
 genrule(

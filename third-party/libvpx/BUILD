@@ -22,7 +22,7 @@ filegroup(
     name = "libvpx_sources",
     srcs = glob([
         "libvpx/**/*"
-    ]),
+    ], allow_empty = True),
 )
 
 
