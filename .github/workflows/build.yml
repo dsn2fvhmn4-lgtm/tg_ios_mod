@@ -1,0 +1,68 @@
+name: Build Telegram iOS
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+          fetch-depth: '0'
+
+      - name: Set active Xcode path
+        run: |
+          XCODE_VERSION=$(cat versions.json | python3 -c 'import json,sys;obj=json.load(sys.stdin);print(obj["xcode"]);')
+          # Try to find the closest available Xcode version if the exact one is not found
+          sudo xcode-select -s /Applications/Xcode_$XCODE_VERSION.app/Contents/Developer || sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+
+      - name: Build the App
+        run: |
+          set -x
+          SOURCE_DIR=$GITHUB_WORKSPACE
+          BAZEL_USER_ROOT="$HOME/.bazel-cache"
+          
+          cd $SOURCE_DIR
+
+          BUILD_NUMBER_OFFSET="$(cat build_number_offset || echo 0)"
+          export APP_VERSION=$(cat versions.json | python3 -c 'import json,sys;obj=json.load(sys.stdin);print(obj["app"]);')
+          export COMMIT_COUNT=$(git rev-list --count HEAD)
+          export COMMIT_COUNT="$(($COMMIT_COUNT+$BUILD_NUMBER_OFFSET))"
+          export BUILD_NUMBER="$COMMIT_COUNT"
+          
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_ENV
+          echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
+
+          # Prepare configuration if missing
+          if [ ! -f "build-system/appstore-configuration.json" ]; then
+            cp build-system/template_minimal_development_configuration.json build-system/appstore-configuration.json
+          fi
+
+          python3 build-system/Make/ImportCertificates.py --path build-system/fake-codesigning/certs
+          
+          # Build without provisioning profiles for a generic IPA
+          python3 -u build-system/Make/Make.py \
+            --bazelUserRoot="$BAZEL_USER_ROOT" \
+            build \
+            --configurationPath="build-system/appstore-configuration.json" \
+            --codesigningInformationPath=build-system/fake-codesigning \
+            --configuration=release_arm64 \
+            --buildNumber="$BUILD_NUMBER" \
+            --overrideXcodeVersion
+
+          # collect ipa
+          OUTPUT_PATH="build/artifacts"
+          rm -rf "$OUTPUT_PATH"
+          mkdir -p "$OUTPUT_PATH"
+          find bazel-out -name "Telegram.ipa" -exec cp {} "$OUTPUT_PATH/" \;
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Telegram-iOS-IPA
+          path: build/artifacts/Telegram.ipa
