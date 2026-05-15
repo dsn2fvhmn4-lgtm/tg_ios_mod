@@ -30,7 +30,7 @@
 	url = https://github.com/ali-fareed/dav1d.git
 [submodule "third-party/td/td"]
 	path = third-party/td/td
-	url = https://github.com/tdlib/td
+	url = https://github.com/tdlib/td.git
 [submodule "third-party/XcodeGen"]
 	path = third-party/XcodeGen
 	url = https://github.com/yonaskolb/XcodeGen.git
