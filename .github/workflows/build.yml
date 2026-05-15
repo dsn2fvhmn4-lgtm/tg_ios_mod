@@ -15,6 +15,11 @@ jobs:
           submodules: 'recursive'
           fetch-depth: '0'
 
+      - name: Force initialize submodules
+        run: |
+          git submodule sync --recursive
+          git submodule update --init --recursive
+
       - name: Set active Xcode path
         run: |
           XCODE_VERSION=$(cat versions.json | python3 -c 'import json,sys;obj=json.load(sys.stdin);print(obj["xcode"]);')
