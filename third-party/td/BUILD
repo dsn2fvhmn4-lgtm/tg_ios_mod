@@ -17,7 +17,7 @@ filegroup(
     name = "td_sources",
     srcs = glob([
         "td/**/*"
-    ]),
+    ], allow_empty = True),
 )
 
 genrule(
