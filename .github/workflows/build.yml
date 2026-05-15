@@ -26,6 +26,19 @@ jobs:
           # Try to find the closest available Xcode version if the exact one is not found
           sudo xcode-select -s /Applications/Xcode_$XCODE_VERSION.app/Contents/Developer || sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 
+      - name: Prepare build environment
+        run: |
+          mkdir -p build-input/configuration-repository
+          echo 'module(name = "build_configuration")' > build-input/configuration-repository/MODULE.bazel
+          touch build-input/configuration-repository/BUILD
+          
+          # Create placeholder directories for submodules to avoid Bazel errors if they are still empty
+          mkdir -p build-system/bazel-rules/sourcekit-bazel-bsp
+          mkdir -p build-system/bazel-rules/rules_apple
+          mkdir -p build-system/bazel-rules/rules_swift
+          mkdir -p build-system/bazel-rules/apple_support
+          mkdir -p build-system/bazel-rules/rules_xcodeproj
+
       - name: Build the App
         run: |
           set -x
