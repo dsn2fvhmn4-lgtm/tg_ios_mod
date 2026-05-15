@@ -19,6 +19,8 @@ jobs:
         run: |
           git submodule sync --recursive
           git submodule update --init --recursive
+          # Check if rlottie is actually there
+          ls -R submodules/rlottie/rlottie | head -n 20
 
       - name: Set active Xcode path
         run: |

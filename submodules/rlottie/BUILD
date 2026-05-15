@@ -11,13 +11,13 @@ objc_library(
         "rlottie/src/vector/vdrawhelper_neon.cpp",
         "rlottie/src/vector/stb/**/*",
         "rlottie/src/lottie/rapidjson/msinttypes/**/*",
-    ]) + [
+    ], allow_empty = True) + [
         "LottieInstance.mm",
         "config.h",
     ],
     hdrs = glob([
         "PublicHeaders/**/*.h",
-    ]),
+    ], allow_empty = True),
     includes = [
         "PublicHeaders",
     ],
