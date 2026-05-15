@@ -28,7 +28,7 @@ objc_library(
     hdrs = glob([
         "lottiecpp/PublicHeaders/**/*.h",
         "lottiecpp/PublicHeaders/**/*.hpp",
-    ]),
+    ], allow_empty = True),
     includes = [
         "lottiecpp/PublicHeaders",
     ],
