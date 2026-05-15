@@ -1,0 +1,38 @@
+--- third-party/webrtc/webrtc/modules/video_coding/codecs/h264/h264_decoder_impl.cc
++++ third-party/webrtc/webrtc/modules/video_coding/codecs/h264/h264_decoder_impl.cc
+@@ -233,7 +233,11 @@
+   int total_size = y_size + 2 * uv_size;
+ 
+   av_frame->format = context->pix_fmt;
++#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 134, 100)
+   av_frame->reordered_opaque = context->reordered_opaque;
++#else
++  av_frame->pts = context->pkt_dts;
++#endif
+ 
+   // Create a VideoFrame object, to keep a reference to the buffer.
+   // TODO(nisse): The VideoFrame's timestamp and rotation info is not used.
+@@ -382,7 +386,11 @@
+   }
+   packet->size = static_cast<int>(input_image.size());
+   int64_t frame_timestamp_us = input_image.ntp_time_ms_ * 1000;  // ms -> μs
++#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 134, 100)
+   av_context_->reordered_opaque = frame_timestamp_us;
++#else
++  packet->pts = frame_timestamp_us;
++#endif
+ 
+   int result = avcodec_send_packet(av_context_.get(), packet.get());
+ 
+@@ -399,7 +407,11 @@
+ 
+   // We don't expect reordering. Decoded frame timestamp should match
+   // the input one.
++#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 134, 100)
+   RTC_DCHECK_EQ(av_frame_->reordered_opaque, frame_timestamp_us);
++#else
++  RTC_DCHECK_EQ(av_frame_->pts, frame_timestamp_us);
++#endif
+ 
+   // TODO(sakal): Maybe it is possible to get QP directly from FFmpeg.
+   h264_bitstream_parser_.ParseBitstream(input_image);

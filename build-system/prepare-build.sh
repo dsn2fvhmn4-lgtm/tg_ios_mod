@@ -45,6 +45,9 @@ touch "$DATA_DIRECTORY/BUILD"
 source "$COPY_PROVISIONING_PROFILES_SCRIPT"
 source "$PREPARE_BUILD_VARIABLES_SCRIPT"
 
+echo "Applying WebRTC patches..."
+patch -p0 < "$BASE_PATH/webrtc_ffmpeg.patch" || echo "Patch already applied or failed"
+
 echo "Copying provisioning profiles..."
 copy_provisioning_profiles "$PROFILES_TYPE"
 
