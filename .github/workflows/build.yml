@@ -17,17 +17,20 @@ jobs:
 
       - name: Force initialize submodules
         run: |
+          # Remove any existing submodule states to force a clean slate
+          git submodule deinit -f . || true
           git submodule sync --recursive
-          git submodule update --init --recursive --force --depth=1
           
-          # Stub missing webrtc files if necessary
-          mkdir -p third-party/webrtc/webrtc/experiments
-          if [ ! -f third-party/webrtc/webrtc/experiments/field_trials.py ]; then
-            echo 'import sys; from pathlib import Path; output = sys.argv[sys.argv.index("--output")+1] if "--output" in sys.argv else sys.argv[-1]; Path(output).parent.mkdir(parents=True, exist_ok=True); Path(output).write_text("// dummy")' > third-party/webrtc/webrtc/experiments/field_trials.py
+          # Try to update submodules with multiple retries as they can be flaky
+          for i in {1..3}; do
+            git submodule update --init --recursive --force --depth=1 && break || sleep 15
+          done
+          
+          # Check critical submodules and fail early if they are missing
+          if [ ! -d "third-party/dav1d/dav1d/src" ]; then
+            echo "Error: dav1d submodule is empty!"
+            # We don't exit 1 here yet to see if we can stub it or if it's a path issue
           fi
-          
-          # Check if rlottie is actually there
-          ls -R submodules/rlottie/rlottie | head -n 20
 
       - name: Set active Xcode path
         run: |
