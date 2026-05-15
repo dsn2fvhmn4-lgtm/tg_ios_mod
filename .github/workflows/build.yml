@@ -10,6 +10,13 @@ jobs:
     runs-on: macos-latest
 
     steps:
+      - name: Environment Info
+        run: |
+          echo "Operating System: $(uname -a)"
+          echo "Xcode Version: $(xcodebuild -version)"
+          echo "Bazel Version: $(bazel --version || echo 'bazel not installed')"
+          df -h
+
       - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
