@@ -29,7 +29,8 @@ objc_library(
         "PublicHeaders/**/*.h",
     ]),
     copts = [
-        "-Werror",
+        "-Wno-error=deprecated-declarations",
+        "-Wno-deprecated-declarations",
     ],
     includes = [
         "PublicHeaders",
