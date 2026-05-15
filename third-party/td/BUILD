@@ -131,7 +131,7 @@ objc_library(
     ], allow_empty=True),
     hdrs = glob([
         "TdBinding/Public/**/*.h",
-    ]),
+    ], allow_empty=True),
     copts = [
         "-Werror",
     ],
