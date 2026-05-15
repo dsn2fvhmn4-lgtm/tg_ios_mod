@@ -48,12 +48,12 @@ jobs:
           # Build without provisioning profiles for a generic IPA
           python3 -u build-system/Make/Make.py \
             --bazelUserRoot="$BAZEL_USER_ROOT" \
+            --overrideXcodeVersion \
             build \
             --configurationPath="build-system/appstore-configuration.json" \
             --codesigningInformationPath=build-system/fake-codesigning \
             --configuration=release_arm64 \
-            --buildNumber="$BUILD_NUMBER" \
-            --overrideXcodeVersion
+            --buildNumber="$BUILD_NUMBER"
 
           # collect ipa
           OUTPUT_PATH="build/artifacts"
